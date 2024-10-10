@@ -1,0 +1,20 @@
+{
+  "name": "todo_manager_node",
+  "version": "1.0.0",
+  "description": "To-do List Manager",
+  "main": "todo.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node todo.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laurawarren88/todo_manager.git"
+  },
+  "author": "LMW",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/laurawarren88/todo_manager/issues"
+  },
+  "homepage": "https://github.com/laurawarren88/todo_manager#readme"
+}
