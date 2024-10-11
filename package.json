@@ -1,6 +1,7 @@
 {
   "name": "todo_manager_node",
   "version": "1.0.0",
+  "type": "module",
   "description": "To-do List Manager",
   "main": "todo.js",
   "scripts": {
@@ -16,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/laurawarren88/todo_manager/issues"
   },
-  "homepage": "https://github.com/laurawarren88/todo_manager#readme"
+  "homepage": "https://github.com/laurawarren88/todo_manager#readme",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "figlet": "^1.8.0"
+  }
 }

@@ -1,31 +1,47 @@
-const fs = require('fs');
+// Enables use of files 
+import fs from 'fs';
+// Enables the use of ascii 
+import figlet from 'figlet';
+// Enables the use of colour in the terminal
+import {Chalk} from 'chalk';
+// Allows more variety of colour with customisation
+const customChalk = new Chalk({level: 2});
+
+// Saves/updates to do list in to a csv file
 const TODO_FILE = 'todo_list.csv';
 
-// Helper function to convert CSV to an array of tasks
+// Helper function to load tasks from CSV
 function loadTasks() {
     try {
         const data = fs.readFileSync(TODO_FILE, 'utf-8');
         return data
             .split('\n')
-            .filter(line => line.trim() !== '') // Remove empty lines
-            .map(line => line.split(',')[1]);   // Extract task description
+            .filter(line => line.trim() !== '')
+            .map(line => {
+                const [id, description, date, type] = line.split(',');
+                return { id: Number(id), description, date, type };
+            });
     } catch (error) {
         return [];
     }
 }
 
-// Helper function to save tasks as CSV
+// Helper function to save tasks to CSV and how they are displayed
 function saveTasks(tasks) {
-    const csvContent = tasks.map((task, index) => `${index + 1},${task}`).join('\n');
+    const csvContent = tasks
+        .map((task, index) => `${index + 1}:,${task.description},${task.date},${task.type}`)
+        .join('\n');
     fs.writeFileSync(TODO_FILE, csvContent);
 }
 
 // Add a new task
-function addTask(task) {
+function addTask(description, type) {
     const tasks = loadTasks();
+    const date = new Date().toISOString().split('T')[0]; // Add the current date
+    const task = { description, date, type };
     tasks.push(task);
     saveTasks(tasks);
-    console.log(`Task added: ${task}`);
+    console.log(`Task added: ${description} (${type}) on ${date}`);
 }
 
 // Remove a task by its number
@@ -34,21 +50,114 @@ function removeTask(taskNumber) {
     if (taskNumber > 0 && taskNumber <= tasks.length) {
         const removedTask = tasks.splice(taskNumber - 1, 1);
         saveTasks(tasks);
-        console.log(`Task removed: ${removedTask}`);
+        console.log(`Task removed: ${removedTask[0].description}`);
     } else {
         console.log('Invalid task number.');
     }
 }
 
-// View all tasks
+
+// Helper function to get colour based on task type
+function getColourForType(type) {
+    switch (type.toLowerCase()) {
+        case 'personal':
+            return customChalk.magentaBright;
+        case 'work':
+            return customChalk.cyanBright;
+        case 'urgent':
+            return customChalk.redBright.bold;
+        case 'health':
+            return customChalk.greenBright;
+        default:
+            return customChalk.whiteBright;
+    }
+}
+
+// Function to display the key/legend for color coding
+function displayKey() {
+    console.log("\nColour Key for task type:");
+    console.log(customChalk.magentaBright("Personal") + (", ") + customChalk.cyanBright("Work") + (", ") + customChalk.redBright.bold("Urgent") + (", ") + customChalk.greenBright("Health"));
+}
+
+// Helper function to get a random chalk colour
+function getRandomColour() {
+    const colours = [
+        customChalk.hex('#fbc021'),
+        customChalk.hex('#38b621'),
+        customChalk.hex('#c72ae3'),
+        customChalk.hex('#4a4ff2'),
+        
+    ];
+    return colours[Math.floor(Math.random() * colours.length)];
+}
+
+// Helper function to randomly colour each letter of ASCII text
+function colourisedAsciiArt(asciiArt) {
+    let colourAsciiArt = '';
+    for (let char of asciiArt) {
+        if (char !== ' ') { 
+            const randomColour = getRandomColour();
+            colourAsciiArt += randomColour(char);
+        } else {
+            colourAsciiArt += char; 
+        }
+    }
+    return colourAsciiArt;
+}
+
+// View all tasks with ASCII art header
 function viewTasks() {
+    // const randomColour = getRandomColour();
+    figlet.text('TO DO LIST', {
+        font: 'alphabet',
+        // font: 'barbwire',
+        // font: 'standard'
+    }, function(err, data) {
+        if (err) {
+            console.log('Something went wrong with figlet...');
+            console.dir(err);
+            return;
+        }
+        
+        // Print ASCII art title
+        console.log(colourisedAsciiArt(data)); 
+
+        // Load and display tasks
+        const tasks = loadTasks();
+        if (tasks.length === 0) {
+            console.log('No tasks in your to-do list.');
+        } else {
+            tasks.forEach((task, index) => {
+                const colourFn = getColourForType(task.type); 
+                console.log(`${index + 1}: ${colourFn(task.description)}`);
+            });
+            displayKey();
+        }
+    });
+}
+
+// Sort tasks by date
+function sortTasks() {
     const tasks = loadTasks();
-    if (tasks.length === 0) {
-        console.log('No tasks in your to-do list.');
+    tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+    console.log('List of tasks in date order:');
+    tasks.forEach((task) => {
+        const colourFn = getColourForType(task.type); 
+        console.log(`${colourFn(task.description)} - ${task.date}`);
+    });
+}
+
+// Filter tasks by type
+function filterTasks(type) {
+    const tasks = loadTasks();
+    const filteredTasks = tasks.filter(task => task.type === type);
+    if (filteredTasks.length === 0) {
+        console.log(`No tasks found for: ${type}`);
     } else {
-        console.log('To-do List:');
-        tasks.forEach((task, index) => {
-            console.log(`${index + 1}. ${task}`);
+        console.log(`These are all your "${type}" tasks:`);
+        filteredTasks.forEach((task) => {
+            const colourFn = getColourForType(task.type); 
+            console.log(`${colourFn(task.description)}`);
         });
     }
 }
@@ -56,14 +165,14 @@ function viewTasks() {
 // Show help message
 function showHelp() {
     console.log(`
-    To-do List Manager:
-
-    Usage:
-      node todo.js add <task>         Add a task
-      node todo.js remove <task_num>  Remove a task by its number
-      node todo.js view               View all tasks
-      node todo.js help               Show this help message
-    `);
+node todo.js add <task> <type>    Add a task with a type
+node todo.js remove <task_num>    Remove a task by its number
+node todo.js view                 View all tasks
+node todo.js sort                 Sort tasks by date
+node todo.js filter <type>        Filter tasks by type
+node todo.js help                 Show this help message`
+    );
+    displayKey();
 }
 
 // Main command-line interface
@@ -75,10 +184,12 @@ if (!command) {
 } else {
     switch (command.toLowerCase()) {
         case 'add':
-            if (args.length === 0) {
-                console.log('Error: Please specify a task to add.');
+            if (args.length < 2) {
+                console.log('Error: Please specify a task description and a type.');
             } else {
-                addTask(args.join(' '));
+                const taskDescription = args[0];
+                const taskType = args[1];
+                addTask(taskDescription, taskType);
             }
             break;
 
@@ -92,6 +203,18 @@ if (!command) {
 
         case 'view':
             viewTasks();
+            break;
+
+        case 'sort':
+            sortTasks();
+            break;
+
+        case 'filter':
+            if (args.length === 0) {
+                console.log('Error: Please specify a task type to filter by.');
+            } else {
+                filterTasks(args[0]);
+            }
             break;
 
         case 'help':
