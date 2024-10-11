@@ -39,11 +39,16 @@ function saveTasks(tasks) {
     fs.writeFileSync(TODO_FILE, tsvContent);
 }
 
+function capitaliseFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 // Add a new task
 function addTask(description, type) {
     const tasks = loadTasks();
     const date = new Date().toDateString(); // .split('T')[0]
-    const task = { description, date, type };
+    const capitalise = capitaliseFirstLetter(description);
+    const task = { description: capitalise, date, type, };
     tasks.push(task);
     saveTasks(tasks);
     console.log(`Task added: ${description} (${type}) on ${date}`);
