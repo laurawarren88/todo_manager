@@ -8,7 +8,8 @@ import {Chalk} from 'chalk';
 const customChalk = new Chalk({level: 2});
 
 // Saves/updates to-do list in to a csv file
-const TODO_FILE = 'todo_list.csv';
+// const TODO_FILE = 'todo_list.csv';
+const TODO_FILE = 'todo_list.tsv';
 
 // Load tasks from CSV
 function loadTasks() {
@@ -18,7 +19,8 @@ function loadTasks() {
             .split('\n')
             .filter(line => line.trim() !== '')
             .map(line => {
-                const [id, description, date, type] = line.split(',');
+                // const [id, description, date, type] = line.split(',');
+                const [id, description, date, type] = line.split('\t');
                 return { id: Number(id), description, date, type };
             });
     } catch (error) {
@@ -28,10 +30,13 @@ function loadTasks() {
 
 // Save tasks to CSV 
 function saveTasks(tasks) {
-    const csvContent = tasks
-        .map((task, index) => `${index + 1}:,${task.description},${task.date},${task.type}`)
+    // const csvContent = tasks
+    const tsvContent = tasks
+        // .map((task, index) => `${index + 1},${task.description},${task.date},${task.type}`)
+        .map((task, index) => `${index + 1}\t${task.description}\t${task.date}\t${task.type}`)
         .join('\n');
-    fs.writeFileSync(TODO_FILE, csvContent);
+    // fs.writeFileSync(TODO_FILE, csvContent);
+    fs.writeFileSync(TODO_FILE, tsvContent);
 }
 
 // Add a new task
@@ -127,7 +132,7 @@ function viewTasks() {
         } else {
             tasks.forEach((task, index) => {
                 const colourFn = getColourForType(task.type); 
-                console.log(`${index + 1}: ${colourFn(task.description)}`);
+                console.log(`${customChalk.whiteBright(index + 1)}${customChalk.whiteBright(":")} ${colourFn(task.description)}`);
             });
             displayKey();
         }
