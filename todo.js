@@ -7,10 +7,10 @@ import {Chalk} from 'chalk';
 // Allows more variety of colour with customisation
 const customChalk = new Chalk({level: 2});
 
-// Saves/updates to do list in to a csv file
+// Saves/updates to-do list in to a csv file
 const TODO_FILE = 'todo_list.csv';
 
-// Helper function to load tasks from CSV
+// Load tasks from CSV
 function loadTasks() {
     try {
         const data = fs.readFileSync(TODO_FILE, 'utf-8');
@@ -26,7 +26,7 @@ function loadTasks() {
     }
 }
 
-// Helper function to save tasks to CSV and how they are displayed
+// Save tasks to CSV 
 function saveTasks(tasks) {
     const csvContent = tasks
         .map((task, index) => `${index + 1}:,${task.description},${task.date},${task.type}`)
@@ -37,7 +37,7 @@ function saveTasks(tasks) {
 // Add a new task
 function addTask(description, type) {
     const tasks = loadTasks();
-    const date = new Date().toISOString().split('T')[0]; // Add the current date
+    const date = new Date().toISOString().split('T')[0]; 
     const task = { description, date, type };
     tasks.push(task);
     saveTasks(tasks);
@@ -56,8 +56,7 @@ function removeTask(taskNumber) {
     }
 }
 
-
-// Helper function to get colour based on task type
+// Colour based on task type
 function getColourForType(type) {
     switch (type.toLowerCase()) {
         case 'personal':
@@ -73,25 +72,24 @@ function getColourForType(type) {
     }
 }
 
-// Function to display the key/legend for color coding
+// Display the key for colour coding
 function displayKey() {
     console.log("\nColour Key for task type:");
     console.log(customChalk.magentaBright("Personal") + (", ") + customChalk.cyanBright("Work") + (", ") + customChalk.redBright.bold("Urgent") + (", ") + customChalk.greenBright("Health"));
 }
 
-// Helper function to get a random chalk colour
+// Random chalk colour
 function getRandomColour() {
     const colours = [
         customChalk.hex('#fbc021'),
         customChalk.hex('#38b621'),
         customChalk.hex('#c72ae3'),
         customChalk.hex('#4a4ff2'),
-        
     ];
     return colours[Math.floor(Math.random() * colours.length)];
 }
 
-// Helper function to randomly colour each letter of ASCII text
+// Randomly colour each letter of ASCII text
 function colourisedAsciiArt(asciiArt) {
     let colourAsciiArt = '';
     for (let char of asciiArt) {
@@ -162,7 +160,6 @@ function filterTasks(type) {
     }
 }
 
-// Show help message
 function showHelp() {
     console.log(`
 node todo.js add <task> <type>    Add a task with a type
@@ -175,7 +172,6 @@ node todo.js help                 Show this help message`
     displayKey();
 }
 
-// Main command-line interface
 const command = process.argv[2];
 const args = process.argv.slice(3);
 
