@@ -37,7 +37,7 @@ function saveTasks(tasks) {
 // Add a new task
 function addTask(description, type) {
     const tasks = loadTasks();
-    const date = new Date().toISOString().split('T')[0]; 
+    const date = new Date().toDateString(); // .split('T')[0]
     const task = { description, date, type };
     tasks.push(task);
     saveTasks(tasks);
