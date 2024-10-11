@@ -6,7 +6,7 @@ This is a JavaScript functioning To-do List.
 
 Tasks are added, saved and removed from the command line.
 
-All tasks can be saved 🛟 to either a .csv or .tsv file depending on need (comment out the one you don't need)
+All tasks can be saved 🛟 to either a .csv or .tsv file depending on need (comment out the one you don't need).
 
 To understand the functionality use 'node todo.js help'.
 
@@ -25,7 +25,9 @@ This project assumes you have the following:
 
 ## 🐾 Step One
 
-To use this To-do list on the command line. Firstly, change your directory to where you wish to run this script and store 🏪 the cloned repository:
+To use this To-do list on the command line. 
+
+Firstly, change your directory to where you wish to run this script and store 🏪 the cloned repository:
 
 ```bash
 cd <filename>
